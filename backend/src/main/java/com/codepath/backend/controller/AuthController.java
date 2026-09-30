@@ -1,21 +1,27 @@
 package com.codepath.backend.controller;
 
+import com.codepath.backend.dto.LoginRequest;
 import com.codepath.backend.dto.RegisterRequest;
+import com.codepath.backend.dto.UserResponse;
 import com.codepath.backend.entity.User;
+import com.codepath.backend.security.JwtService;
 import com.codepath.backend.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import com.codepath.backend.dto.UserResponse;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
 
     private final UserService userService;
+    private final JwtService jwtService;
 
-    public AuthController(UserService userService) {
+    public AuthController(UserService userService, JwtService jwtService) {
         this.userService = userService;
+        this.jwtService = jwtService;
     }
 
     @PostMapping("/register")
@@ -35,5 +41,18 @@ public class AuthController {
                 savedUser.getEmail(),
                 savedUser.getCreatedAt()
         );
+    }
+
+    @PostMapping("/login")
+    public Map<String, String> login(@Valid @RequestBody LoginRequest request) {
+
+        User user = userService.login(
+                request.getEmail(),
+                request.getPassword()
+        );
+
+        String token = jwtService.generateToken(user.getEmail());
+
+        return Map.of("token", token);
     }
 }

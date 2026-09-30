@@ -6,6 +6,7 @@ import com.codepath.backend.service.UserService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.codepath.backend.exception.EmailAlreadyExistsException;
+import com.codepath.backend.exception.InvalidCredentialsException;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -26,5 +27,22 @@ public class UserServiceImpl implements UserService {
         }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
+    }
+
+    @Override
+    public User login(String email, String password) {
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new InvalidCredentialsException(
+                        "Invalid email or password"
+                ));
+
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new InvalidCredentialsException(
+                    "Invalid email or password"
+            );
+        }
+
+        return user;
     }
 }
