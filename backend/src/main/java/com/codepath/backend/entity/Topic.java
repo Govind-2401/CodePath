@@ -2,6 +2,8 @@ package com.codepath.backend.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "topics")
@@ -16,6 +18,14 @@ public class Topic {
 
     @Column(columnDefinition = "TEXT")
     private String description;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "topic_prerequisites",
+            joinColumns = @JoinColumn(name = "topic_id"),
+            inverseJoinColumns = @JoinColumn(name = "prerequisite_topic_id")
+    )
+    private Set<Topic> prerequisites = new HashSet<>();
 
     private LocalDateTime createdAt;
 
@@ -45,6 +55,14 @@ public class Topic {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Set<Topic> getPrerequisites() {
+        return prerequisites;
+    }
+
+    public void setPrerequisites(Set<Topic> prerequisites) {
+        this.prerequisites = prerequisites;
     }
 
     public LocalDateTime getCreatedAt() {

@@ -63,7 +63,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
 
         } catch (Exception exception) {
-            System.out.println("Invalid JWT token");
+            exception.printStackTrace();
         }
 
         filterChain.doFilter(request, response);
